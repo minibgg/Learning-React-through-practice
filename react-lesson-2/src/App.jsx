@@ -3,6 +3,33 @@ import { useState, useEffect } from "react";
 export default function App() {
   const [users, setUsers] = useState([]);
   const [filterInput, setFilterInput] = useState("");
+
+  function FilterInput(props) {
+    return (
+      <>
+        <input
+          value={props.value}
+          onChange={(e) => props.setInput(e.target.value)}
+          placeholder={props.placeholder}
+        />
+      </>
+    );
+  }
+
+  function User(props) {
+    return <div>{props.user.name}</div>;
+  }
+
+  function UserList(props) {
+    return (
+      <>
+        {props.users.map((user) => (
+          <User key={user.id} user={user} />
+        ))}
+      </>
+    );
+  }
+
   useEffect(() => {
     fetch("https://jsonplaceholder.typicode.com/users")
       .then((response) => response.json())
@@ -20,16 +47,12 @@ export default function App() {
 
   return (
     <>
-      <input
+      <FilterInput
         value={filterInput}
-        placeholder="Filter by name"
-        onChange={(e) => setFilterInput(e.target.value)}
+        setInput={setFilterInput}
+        placeholder="Search user"
       />
-      <div>
-        {filteredUsers.map((filteredUser) => (
-          <div key={filteredUser.id}>{filteredUser.name}</div>
-        ))}
-      </div>
+      <UserList users={filteredUsers}></UserList>
     </>
   );
 }
