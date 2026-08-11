@@ -14,6 +14,11 @@ const foundHighestLvlPlayer = players
   .filter((player) => player.level >= 30)
   .sort((a, b) => b.level - a.level)[0];
 
+const copyPlayers = structuredClone(players);
+copyPlayers.sort((a, b) => b.winrate - a.winrate)[0];
+
+const haseWRUp60 = players.some((player) => player.winrate > 60);
+
 export default function App() {
   const [users, setUsers] = useState([]);
   const [filterInput, setFilterInput] = useState("");
