@@ -81,7 +81,7 @@ export default function App() {
     function checkWinrate() {
       const WrUp60 = props.users.some((user) => user.winrate > props.wr);
       if (WrUp60 === true) {
-        alert(`some player have winrate ${props.wr}`);
+        alert(`some player have winrate > ${props.wr}`);
       } else {
         alert(`no one dont have wr > ${props.wr}`);
       }
