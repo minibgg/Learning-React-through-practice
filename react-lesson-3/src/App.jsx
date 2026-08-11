@@ -8,6 +8,12 @@ const players = [
   { id: 5, name: "Daniel", level: 27, winrate: 46 },
 ];
 
+const foundPlayer = players.find((player) => player.id === 3);
+
+const foundHighestLvlPlayer = players
+  .filter((player) => player.level >= 30)
+  .sort((a, b) => b.level - a.level)[0];
+
 export default function App() {
   const [users, setUsers] = useState([]);
   const [filterInput, setFilterInput] = useState("");
