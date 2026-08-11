@@ -77,6 +77,18 @@ export default function App() {
     ));
   }
 
+  function CheckWinrate(props) {
+    function checkWinrate() {
+      const WrUp60 = props.users.some((user) => user.winrate > props.wr);
+      if (WrUp60 === true) {
+        alert(`some player have winrate ${props.wr}`);
+      } else {
+        alert(`no one dont have wr > ${props.wr}`);
+      }
+    }
+    return <button onClick={checkWinrate}>check winrate</button>;
+  }
+
   const filteredUsers = users.filter(function (user) {
     if (filterInput === "") {
       return true;
@@ -96,6 +108,8 @@ export default function App() {
         allUsers={users}
         setUsers={setUsers}
       ></UserList>
+      <CheckWinrate wr={60} users={users} />
+      <CheckWinrate wr={40} users={users} />
     </>
   );
 }
