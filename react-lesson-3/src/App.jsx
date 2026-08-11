@@ -8,16 +8,18 @@ const players = [
   { id: 5, name: "Daniel", level: 27, winrate: 46 },
 ];
 
-const foundPlayer = players.find((player) => player.id === 3);
+// const foundPlayer = players.find((player) => player.id === 3);
 
-const foundHighestLvlPlayer = players
-  .filter((player) => player.level >= 30)
-  .sort((a, b) => b.level - a.level)[0];
+// const foundHighestLvlPlayer = players
+//   .filter((player) => player.level >= 30)
+//   .sort((a, b) => b.level - a.level)[0];
 
-const copyPlayers = structuredClone(players);
-copyPlayers.sort((a, b) => b.winrate - a.winrate)[0];
+// const copyPlayers = structuredClone(players);
+// copyPlayers.sort((a, b) => b.winrate - a.winrate)[0];
 
-const haseWRUp60 = players.some((player) => player.winrate > 60);
+// const someHasWrUp60 = players.some((player) => player.winrate > 60);
+
+// const allHasWrUp40 = players.every((player) => player.winrate > 40)
 
 export default function App() {
   const [users, setUsers] = useState([]);
