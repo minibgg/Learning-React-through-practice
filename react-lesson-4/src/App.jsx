@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 
 const players = [
   { id: 1, name: "John", level: 25, winrate: 57 },
@@ -25,22 +25,36 @@ export default function App() {
   //   return <button onClick={handleClick}>Check level</button>;
   // }
 
-  function Counter(props) {
-    function handleClick() {
-      props.setCount((prevCount) => {
-        console.log("Новое значение:", prevCount + 1); // Логируем актуальное новое значение
-        return prevCount + 1;
-      });
-    }
+  const handleCounterClick = useCallback(() => {
+    setCount((prev) => prev + 1);
+  }, []);
 
-    return <button onClick={handleClick}>+</button>;
+  function Counter(props) {
+    // function handleClick() {
+    //   props.setCount((prevCount) => {
+    //     console.log("Новое значение:", prevCount + 1); // Логируем актуальное новое значение
+    //     return prevCount + 1;
+    //   });
+    // }
+
+    console.log("Counter render");
+
+    return <button onClick={props.onClick}>+</button>;
+  }
+
+  const handleResetCounter = useCallback(() => {
+    setCount(0);
+  }, []);
+
+  function ResetButton(props) {
+    return <button onClick={props.onClick}>Reset count</button>;
   }
 
   const averageWinrate = useMemo(() => {
-    const totalWinrate = playersClone.reduce((acc, item) => {
+    const totalWinrate = users.reduce((acc, item) => {
       return acc + item.winrate;
     }, 0);
-    return totalWinrate / playersClone.length;
+    return totalWinrate / users.length;
   }, [users]);
 
   const highestWinrate = useMemo(() => {
@@ -51,9 +65,10 @@ export default function App() {
   return (
     <>
       <div>Счётчик: {count}</div>
-      <Counter count={count} setCount={setCount} />
+      <Counter onClick={handleCounterClick} />
       <div>Highest winrate: {highestWinrate.winrate}</div>
       <div>Average winrate: {averageWinrate}</div>
+      <ResetButton onClick={handleResetCounter}></ResetButton>
       {/* <CheckLvl players={players} /> */}
     </>
   );
