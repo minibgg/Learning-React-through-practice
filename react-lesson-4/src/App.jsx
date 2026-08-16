@@ -8,34 +8,35 @@ const players = [
   { id: 5, name: "Daniel", level: 27, winrate: 46 },
 ];
 
-function CheckLvl(props) {
-  function handleClick() {
-    console.log("Searching...");
-    setTimeout(() => {
-      const playerHighestLvl = props.players.sort(
-        (a, b) => b.level - a.level,
-      )[0];
-      console.log(playerHighestLvl.level);
-    }, 1000);
-  }
-  return <button onClick={handleClick}>Check level</button>;
-}
-
-function Counter(count, setCount) {
-  function handleClick() {
-    setCount((prevCount) => {
-      console.log("Новое значение:", prevCount + 1); // Логируем актуальное новое значение
-      return prevCount + 1;
-    });
-  }
-
-  return <button onClick={handleClick}>+</button>;
-}
-
 export default function App() {
   const [users, setUsers] = useState(players);
   const [count, setCount] = useState(0);
 
+  function CheckLvl(props) {
+    function handleClick() {
+      console.log("Searching...");
+      setTimeout(() => {
+        const playerHighestLvl = props.players.sort(
+          (a, b) => b.level - a.level,
+        )[0];
+        console.log(playerHighestLvl.level);
+      }, 1000);
+    }
+    return <button onClick={handleClick}>Check level</button>;
+  }
+
+  function Counter(props) {
+    function handleClick() {
+      props.setCount((prevCount) => {
+        console.log("Новое значение:", prevCount + 1); // Логируем актуальное новое значение
+        return prevCount + 1;
+      });
+    }
+
+    return <button onClick={handleClick}>+</button>;
+  }
+
+  console.log("App render");
   return (
     <>
       <div>Счётчик: {count}</div>
