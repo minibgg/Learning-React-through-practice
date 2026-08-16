@@ -35,17 +35,25 @@ export default function App() {
 
     return <button onClick={handleClick}>+</button>;
   }
-  const playerHighestLvl = useMemo(() => {
-    console.log("Searching...");
 
-    return [...users].sort((a, b) => b.level - a.level)[0];
+  const averageWinrate = useMemo(() => {
+    const totalWinrate = playersClone.reduce((acc, item) => {
+      return acc + item.winrate;
+    }, 0);
+    return totalWinrate / playersClone.length;
   }, [users]);
+
+  const highestWinrate = useMemo(() => {
+    return [...users].sort((a, b) => b.winrate - a.winrate)[0];
+  }, [users]);
+
   console.log("App render");
   return (
     <>
       <div>Счётчик: {count}</div>
       <Counter count={count} setCount={setCount} />
-      <div>Highest level: {playerHighestLvl.level}</div>
+      <div>Highest winrate: {highestWinrate.winrate}</div>
+      <div>Average winrate: {averageWinrate}</div>
       {/* <CheckLvl players={players} /> */}
     </>
   );
