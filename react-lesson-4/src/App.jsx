@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const players = [
   { id: 1, name: "John", level: 25, winrate: 57 },
@@ -12,18 +12,18 @@ export default function App() {
   const [users, setUsers] = useState(players);
   const [count, setCount] = useState(0);
 
-  function CheckLvl(props) {
-    function handleClick() {
-      console.log("Searching...");
-      setTimeout(() => {
-        const playerHighestLvl = props.players.sort(
-          (a, b) => b.level - a.level,
-        )[0];
-        console.log(playerHighestLvl.level);
-      }, 1000);
-    }
-    return <button onClick={handleClick}>Check level</button>;
-  }
+  // function CheckLvl(props) {
+  //   function handleClick() {
+  //     console.log("Searching...");
+  //     setTimeout(() => {
+  //       const playerHighestLvl = [...users].sort(
+  //         (a, b) => b.level - a.level,
+  //       )[0];
+  //       console.log(playerHighestLvl.level);
+  //     }, 1000);
+  //   }
+  //   return <button onClick={handleClick}>Check level</button>;
+  // }
 
   function Counter(props) {
     function handleClick() {
@@ -35,13 +35,18 @@ export default function App() {
 
     return <button onClick={handleClick}>+</button>;
   }
+  const playerHighestLvl = useMemo(() => {
+    console.log("Searching...");
 
+    return [...users].sort((a, b) => b.level - a.level)[0];
+  }, [users]);
   console.log("App render");
   return (
     <>
       <div>Счётчик: {count}</div>
       <Counter count={count} setCount={setCount} />
-      <CheckLvl players={players} />
+      <div>Highest level: {playerHighestLvl.level}</div>
+      {/* <CheckLvl players={players} /> */}
     </>
   );
 }
