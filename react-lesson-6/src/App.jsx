@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, memo } from "react";
 
 const players = [
   { id: 1, name: "John", level: 25, winrate: 57 },
@@ -32,14 +32,15 @@ function AverageWinrate(props) {
   return <>Average winrate: {averageWinrate}</>;
 }
 
-function User(props) {
+const User = memo(function User(props) {
   return (
     <span>
+      {console.log("User render")}
       name: {props.user.name} | level: {props.user.level} | winrate:{" "}
       {props.user.winrate}
     </span>
   );
-}
+});
 
 function LvlUpButton(props) {
   return <button onClick={() => props.lvlUp(props.user.id)}>+</button>;
@@ -94,7 +95,7 @@ export default function App() {
     });
   }, []);
   const filteredUsers = useMemo(() => {
-    users.filter(function (user) {
+    return users.filter(function (user) {
       if (filterInput === "") {
         return true;
       } else {
