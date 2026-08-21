@@ -42,21 +42,17 @@ const User = memo(function User(props) {
   );
 });
 
-function LvlUpButton(props) {
+const LvlUpButton = memo(function LvlUpButton(props) {
+  console.log("lvlUpbutton render");
   return <button onClick={() => props.lvlUp(props.user.id)}>+</button>;
-}
+});
 
 function UserList(props) {
   return props.users.map((user) => {
     return (
       <div key={user.id}>
         <User user={user} />
-        <LvlUpButton
-          users={props.users}
-          setUsers={props.setUsers}
-          user={user}
-          lvlUp={props.lvlUp}
-        />
+        <LvlUpButton user={user} lvlUp={props.lvlUp} />
       </div>
     );
   });
