@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useCallback, useState, useMemo, memo } from "react";
 
 const players = [
@@ -9,10 +10,7 @@ const players = [
 ];
 
 function HighestLevel(props) {
-  const copyPlayers = [...props.users];
-  const highestPlayer = copyPlayers.sort((a, b) => b.level - a.level)[0];
-
-  return <>Highest level: {highestPlayer.level}</>;
+  return <>Highest level: {props.HL}</>;
 }
 
 function ResetLevel(props) {
@@ -73,8 +71,25 @@ function PlayerStats(props) {
 }
 
 export default function App() {
-  const [users, setUsers] = useState(players);
   const [filterInput, setFilterInput] = useState("");
+  const [users, setUsers] = useState(() => {
+    const saved = localStorage.getItem("saved_players");
+
+    if (saved !== null) {
+      return JSON.parse(saved);
+    }
+    return players;
+  });
+
+  const highestLevel =
+    [...users].sort((a, b) => b.level - a.level)[0]?.level || 0;
+
+  useEffect(() => {
+    localStorage.setItem("saved_players", JSON.stringify(users));
+  }, [users]);
+  useEffect(() => {
+    document.title = `Игроков:${users.length} | Макс. уровень:${highestLevel}`;
+  }, [users.length, highestLevel]);
 
   const handleLvlUp = useCallback((id) => {
     setUsers((prevUsers) => {
@@ -112,7 +127,7 @@ export default function App() {
       <ResetLevel setUsers={setUsers} />
       <AverageWinrate users={users} />
       <br />
-      <HighestLevel users={users} />
+      <HighestLevel HL={highestLevel} />
     </>
   );
 }
