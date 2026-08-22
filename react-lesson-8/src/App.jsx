@@ -87,23 +87,32 @@ function SessionTimer() {
 
 export default function App() {
   const [showTimer, setShowTimer] = useState(true);
-
+  const [isLoading, setIsLoading] = useState(true);
   const [filterInput, setFilterInput] = useState("");
-  const [users, setUsers] = useState(() => {
-    const saved = localStorage.getItem("saved_players");
+  const [users, setUsers] = useState([]);
 
-    if (saved !== null) {
-      return JSON.parse(saved);
-    }
-    return players;
-  });
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+      setUsers(() => {
+        const saved = localStorage.getItem("saved_players");
+
+        if (saved !== null) {
+          return JSON.parse(saved);
+        }
+        return players;
+      });
+    }, 2000);
+  }, []);
 
   const highestLevel =
     [...users].sort((a, b) => b.level - a.level)[0]?.level || 0;
 
   useEffect(() => {
-    localStorage.setItem("saved_players", JSON.stringify(users));
-  }, [users]);
+    if (isLoading === false) {
+      localStorage.setItem("saved_players", JSON.stringify(users));
+    }
+  }, [users, isLoading]);
   useEffect(() => {
     document.title = `Игроков:${users.length} | Макс. уровень:${highestLevel}`;
   }, [users.length, highestLevel]);
@@ -132,24 +141,32 @@ export default function App() {
     });
   }, [users, filterInput]);
 
-  return (
-    <>
-      <FilterInput
-        value={filterInput}
-        onChange={setFilterInput}
-        placeholder="Search for name"
-      />
-      <UserList lvlUp={handleLvlUp} setUsers={setUsers} users={filteredUsers} />
-      <PlayerStats users={users} />
-      <ResetLevel setUsers={setUsers} />
-      <AverageWinrate users={users} />
-      <br />
-      <HighestLevel HL={highestLevel} />
-      <br />
-      {showTimer && <SessionTimer />}
-      <button onClick={() => setShowTimer((prev) => !prev)}>
-        Переключить таймер
-      </button>
-    </>
-  );
+  if (isLoading === true) {
+    return <div>Загрузка данных</div>;
+  } else {
+    return (
+      <>
+        <FilterInput
+          value={filterInput}
+          onChange={setFilterInput}
+          placeholder="Search for name"
+        />
+        <UserList
+          lvlUp={handleLvlUp}
+          setUsers={setUsers}
+          users={filteredUsers}
+        />
+        <PlayerStats users={users} />
+        <ResetLevel setUsers={setUsers} />
+        <AverageWinrate users={users} />
+        <br />
+        <HighestLevel HL={highestLevel} />
+        <br />
+        {showTimer && <SessionTimer />}
+        <button onClick={() => setShowTimer((prev) => !prev)}>
+          Переключить таймер
+        </button>
+      </>
+    );
+  }
 }
