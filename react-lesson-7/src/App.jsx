@@ -70,7 +70,12 @@ function PlayerStats(props) {
   return <>сейчас {props.users.length} игроков</>;
 }
 
+function SessionTimer(props) {
+  return <>Время сессии: {props.timer} сек.</>;
+}
+
 export default function App() {
+  const [seconds, setSeconds] = useState(0);
   const [filterInput, setFilterInput] = useState("");
   const [users, setUsers] = useState(() => {
     const saved = localStorage.getItem("saved_players");
@@ -80,6 +85,16 @@ export default function App() {
     }
     return players;
   });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds((prevTimer) => prevTimer + 1);
+    }, 1000);
+
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
 
   const highestLevel =
     [...users].sort((a, b) => b.level - a.level)[0]?.level || 0;
@@ -128,6 +143,8 @@ export default function App() {
       <AverageWinrate users={users} />
       <br />
       <HighestLevel HL={highestLevel} />
+      <br />
+      <SessionTimer timer={seconds} />
     </>
   );
 }
