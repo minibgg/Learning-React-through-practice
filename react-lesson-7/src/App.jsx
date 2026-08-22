@@ -70,22 +70,8 @@ function PlayerStats(props) {
   return <>сейчас {props.users.length} игроков</>;
 }
 
-function SessionTimer(props) {
-  return <>Время сессии: {props.timer} сек.</>;
-}
-
-export default function App() {
+function SessionTimer() {
   const [seconds, setSeconds] = useState(0);
-  const [filterInput, setFilterInput] = useState("");
-  const [users, setUsers] = useState(() => {
-    const saved = localStorage.getItem("saved_players");
-
-    if (saved !== null) {
-      return JSON.parse(saved);
-    }
-    return players;
-  });
-
   useEffect(() => {
     const timer = setInterval(() => {
       setSeconds((prevTimer) => prevTimer + 1);
@@ -95,6 +81,22 @@ export default function App() {
       clearInterval(timer);
     };
   }, []);
+
+  return <>Время сессии: {seconds} сек.</>;
+}
+
+export default function App() {
+  const [showTimer, setShowTimer] = useState(true);
+
+  const [filterInput, setFilterInput] = useState("");
+  const [users, setUsers] = useState(() => {
+    const saved = localStorage.getItem("saved_players");
+
+    if (saved !== null) {
+      return JSON.parse(saved);
+    }
+    return players;
+  });
 
   const highestLevel =
     [...users].sort((a, b) => b.level - a.level)[0]?.level || 0;
@@ -144,7 +146,10 @@ export default function App() {
       <br />
       <HighestLevel HL={highestLevel} />
       <br />
-      <SessionTimer timer={seconds} />
+      {showTimer && <SessionTimer />}
+      <button onClick={() => setShowTimer((prev) => !prev)}>
+        Переключить таймер
+      </button>
     </>
   );
 }
