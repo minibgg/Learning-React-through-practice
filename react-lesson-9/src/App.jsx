@@ -104,7 +104,10 @@ export default function App() {
           const saved = localStorage.getItem("saved_players");
 
           if (saved !== null) {
-            return JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            if (parsed.length > 0) {
+              return parsed;
+            }
           }
           return players;
         });
