@@ -90,19 +90,33 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [filterInput, setFilterInput] = useState("");
   const [users, setUsers] = useState([]);
+  const [error, setError] = useState(null);
+
+  function fetchPlayer() {
+    setIsLoading(true);
+    setError(null);
+    const randomNum100 = Math.random() * 101;
+    console.log(randomNum100.toFixed(0));
+    setTimeout(() => {
+      if (randomNum100.toFixed(0) <= 50) {
+        setIsLoading(false);
+        setUsers(() => {
+          const saved = localStorage.getItem("saved_players");
+
+          if (saved !== null) {
+            return JSON.parse(saved);
+          }
+          return players;
+        });
+      } else {
+        setIsLoading(false);
+        setError("Ошибка парсинга игроков");
+      }
+    }, 2000);
+  }
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-      setUsers(() => {
-        const saved = localStorage.getItem("saved_players");
-
-        if (saved !== null) {
-          return JSON.parse(saved);
-        }
-        return players;
-      });
-    }, 2000);
+    fetchPlayer();
   }, []);
 
   const highestLevel =
@@ -142,7 +156,14 @@ export default function App() {
   }, [users, filterInput]);
 
   if (isLoading === true) {
-    return <div>Загрузка данных</div>;
+    return <div>Загрузка игроков</div>;
+  } else if (error !== null) {
+    return (
+      <>
+        <div>Ошибка загрузки игроков</div>
+        <button onClick={fetchPlayer}>Попробовать ещё раз</button>
+      </>
+    );
   } else {
     return (
       <>
