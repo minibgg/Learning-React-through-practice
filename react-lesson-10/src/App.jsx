@@ -92,34 +92,44 @@ export default function App() {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
-  function fetchPlayer() {
-    setIsLoading(true);
-    setError(null);
-    const randomNum100 = Math.random() * 101;
-    console.log(randomNum100.toFixed(0));
-    setTimeout(() => {
-      if (randomNum100.toFixed(0) <= 50) {
-        setIsLoading(false);
-        setUsers(() => {
-          const saved = localStorage.getItem("saved_players");
+  async function fetchPlayer(signal) {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const randomNum100 = Math.random() * 101;
+      console.log(randomNum100.toFixed(0));
 
-          if (saved !== null) {
-            const parsed = JSON.parse(saved);
-            if (parsed.length > 0) {
-              return parsed;
-            }
-          }
-          return players;
-        });
-      } else {
-        setIsLoading(false);
-        setError("Ошибка парсинга игроков");
+      const res = await fetch("https://jsonplaceholder.typicode.com/users", {
+        signal,
+      });
+      if (!res.ok) {
+        throw new Error("Ошибка загрузки");
       }
-    }, 2000);
+      const data = await res.json();
+      const formatedUsers = data.map((user) => ({
+        id: user.id,
+        name: user.name,
+        level: Math.floor(Math.random() * 30) + 1,
+        winrate: Math.floor(Math.random() * 40) + 40,
+      }));
+
+      setUsers(formatedUsers);
+      console.log(formatedUsers);
+    } catch (err) {
+      if (err.name === "AbortError") return;
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   useEffect(() => {
-    fetchPlayer();
+    const controller = new AbortController();
+    fetchPlayer(controller.signal);
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   const highestLevel =
