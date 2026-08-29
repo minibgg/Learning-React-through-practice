@@ -85,52 +85,69 @@ function SessionTimer() {
   return <>Время сессии: {seconds} сек.</>;
 }
 
-export default function App() {
-  const [showTimer, setShowTimer] = useState(true);
+function useFetch(url) {
+  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filterInput, setFilterInput] = useState("");
-  const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
-  async function fetchPlayer(signal) {
-    try {
-      setIsLoading(true);
+  const fetchData = useCallback(
+    async (signal) => {
       setError(null);
-      const randomNum100 = Math.random() * 101;
-      console.log(randomNum100.toFixed(0));
-
-      const res = await fetch("https://jsonplaceholder.typicode.com/users", {
-        signal,
-      });
-      if (!res.ok) {
-        throw new Error("Ошибка загрузки");
+      setIsLoading(true);
+      if (!url) {
+        console.error("url is incorect");
+        setIsLoading(false);
+        return;
       }
-      const data = await res.json();
-      const formatedUsers = data.map((user) => ({
-        id: user.id,
-        name: user.name,
-        level: Math.floor(Math.random() * 30) + 1,
-        winrate: Math.floor(Math.random() * 40) + 40,
-      }));
-
-      setUsers(formatedUsers);
-      console.log(formatedUsers);
-    } catch (err) {
-      if (err.name === "AbortError") return;
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+      try {
+        const res = await fetch(url, { signal });
+        if (!res.ok) {
+          throw new Error("Ошибка запроса");
+        }
+        const data = await res.json();
+        const formatedUsers = data.map((user) => ({
+          id: user.id,
+          name: user.name,
+          level: Math.floor(Math.random() * 30) + 1,
+          winrate: Math.floor(Math.random() * 50) + 1,
+        }));
+        setData(formatedUsers);
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        setError(error.message);
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [url],
+  );
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchPlayer(controller.signal);
 
+    fetchData(controller.signal);
     return () => {
       controller.abort();
     };
-  }, []);
+  }, [url, fetchData]);
+  return { data, isLoading, error, reFetch: fetchData };
+}
+
+export default function App() {
+  const {
+    data: initUsers,
+    isLoading,
+    error,
+    reFetch,
+  } = useFetch("https://jsonplaceholder.typicode.com/users");
+  const [showTimer, setShowTimer] = useState(true);
+  const [filterInput, setFilterInput] = useState("");
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    setUsers(initUsers);
+  }, [initUsers]);
 
   const highestLevel =
     [...users].sort((a, b) => b.level - a.level)[0]?.level || 0;
@@ -174,7 +191,7 @@ export default function App() {
     return (
       <>
         <div>Ошибка загрузки игроков</div>
-        <button onClick={fetchPlayer}>Попробовать ещё раз</button>
+        <button onClick={reFetch}>Попробовать ещё раз</button>
       </>
     );
   } else {
