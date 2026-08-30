@@ -1,13 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useReducer } from "react";
 import { useCallback, useState, useMemo, memo } from "react";
-
-const players = [
-  { id: 1, name: "John", level: 25, winrate: 57 },
-  { id: 2, name: "Ivan", level: 18, winrate: 49 },
-  { id: 3, name: "Alex", level: 32, winrate: 63 },
-  { id: 4, name: "Mike", level: 12, winrate: 54 },
-  { id: 5, name: "Daniel", level: 27, winrate: 46 },
-];
 
 function HighestLevel(props) {
   return <>Highest level: {props.HL}</>;
@@ -15,7 +7,7 @@ function HighestLevel(props) {
 
 function ResetLevel(props) {
   function resetLvl() {
-    props.setUsers(players);
+    props.dispatch({ type: "SET_PLAYERS", payload: props.initUsers });
   }
 
   return <button onClick={() => resetLvl()}>RESET LEVELS</button>;
@@ -134,6 +126,27 @@ function useFetch(url) {
   return { data, isLoading, error, reFetch: fetchData };
 }
 
+function playerReducer(state, action) {
+  switch (action.type) {
+    case "SET_PLAYERS": {
+      return action.payload;
+    }
+    case "LVL_UP": {
+      return state.map((user) => {
+        if (user.id === action.id) {
+          return {
+            ...user,
+            level: user.level + 1,
+          };
+        }
+        return user;
+      });
+    }
+    default:
+      return state;
+  }
+}
+
 export default function App() {
   const {
     data: initUsers,
@@ -143,10 +156,10 @@ export default function App() {
   } = useFetch("https://jsonplaceholder.typicode.com/users");
   const [showTimer, setShowTimer] = useState(true);
   const [filterInput, setFilterInput] = useState("");
-  const [users, setUsers] = useState([]);
+  const [users, dispatch] = useReducer(playerReducer, []);
 
   useEffect(() => {
-    setUsers(initUsers);
+    dispatch({ type: "SET_PLAYERS", payload: initUsers });
   }, [initUsers]);
 
   const highestLevel =
@@ -162,19 +175,9 @@ export default function App() {
   }, [users.length, highestLevel]);
 
   const handleLvlUp = useCallback((id) => {
-    setUsers((prevUsers) => {
-      return prevUsers.map((user) => {
-        if (user.id === id) {
-          return {
-            ...user,
-            level: user.level + 1,
-          };
-        }
-
-        return user;
-      });
-    });
+    dispatch({ type: "LVL_UP", id });
   }, []);
+
   const filteredUsers = useMemo(() => {
     return users.filter(function (user) {
       if (filterInput === "") {
@@ -202,13 +205,9 @@ export default function App() {
           onChange={setFilterInput}
           placeholder="Search for name"
         />
-        <UserList
-          lvlUp={handleLvlUp}
-          setUsers={setUsers}
-          users={filteredUsers}
-        />
+        <UserList lvlUp={handleLvlUp} users={filteredUsers} />
         <PlayerStats users={users} />
-        <ResetLevel setUsers={setUsers} />
+        <ResetLevel dispatch={dispatch} initUsers={initUsers} />
         <AverageWinrate users={users} />
         <br />
         <HighestLevel HL={highestLevel} />
